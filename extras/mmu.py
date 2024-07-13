@@ -465,7 +465,7 @@ class Mmu:
         self.toolhead_ooze_reduction = config.getfloat('toolhead_ooze_reduction', 0., minval=-10., maxval=35.) # +ve value = reduction of load length
         self.toolhead_unload_safety_margin = config.getfloat('toolhead_unload_safety_margin', 10., minval=0.) # Extra unload distance
         self.toolhead_move_error_tolerance = config.getfloat('toolhead_move_error_tolerance', 60, minval=0, maxval=100) # Allowable delta movement % before error
-        self.toolhead_post_load_tighten = config.getint('toolhead_post_load_tighten', 0, minval=0, maxval=1) # Whether to apply filament tightening move after load (if not synced)
+        self.toolhead_post_load_tighten = config.getint('toolhead_post_load_tighten', 0, minval=0, maxval=1) # Whether to apply filament tightening move after load (if not synced). TODO: Currently hidden
 
         # Extra Gear/Extruder synchronization controls
         self.sync_to_extruder = config.getint('sync_to_extruder', 0, minval=0, maxval=1)
@@ -705,6 +705,10 @@ class Mmu:
 
         # Initializer tasks
         self.gcode.register_command('__MMU_BOOTUP_TASKS', self.cmd_MMU_BOOTUP_TASKS, desc = self.cmd_MMU_BOOTUP_TASKS_help) # Bootup tasks
+
+        # User defined
+        self.gcode.register_command('MMU_CUT', self.cmd_MMU_CUT, desc=self.cmd_MMU_CUT_help)
+        self.gcode.register_command('_MMU_STEP_UNLOAD_GATE_CUT', self.cmd_MMU_STEP_UNLOAD_GATE_CUT, desc = self.cmd_MMU_STEP_UNLOAD_GATE_CUT_help)
 
         # We setup MMU hardware during configuration since some hardware like endstop requires
         # configuration during the MCU config phase, which happens before klipper connection
@@ -1384,6 +1388,7 @@ class Mmu:
                 'extruder_filament_remaining': self.filament_remaining,
                 'extruder_residual_filament': self.toolhead_ooze_reduction,
                 'toolchange_retract': self.toolchange_retract,
+                'gate_parking_distance': self.gate_parking_distance
         }
 
     def _reset_statistics(self):
@@ -2023,11 +2028,13 @@ class Mmu:
         self._log_debug("Setting servo to down (filament drive) position at angle: %d" % self.servo_angles['down'])
         self._movequeues_wait_moves()
         self.servo.set_value(angle=self.servo_angles['down'], duration=None if self.servo_active_down or self.servo_always_active else self.servo_duration)
+        self._movequeues_dwell(max(self.servo_dwell, self.servo_duration, 0))
         if self.servo_angle != self.servo_angles['down'] and buzz_gear and self.servo_buzz_gear_on_down > 0:
             for i in range(self.servo_buzz_gear_on_down):
                 self._trace_filament_move(None, 0.8, speed=25, accel=self.gear_buzz_accel, encoder_dwell=None)
+                self._movequeues_wait_moves(toolhead=True, mmu_toolhead=True)
                 self._trace_filament_move(None, -0.8, speed=25, accel=self.gear_buzz_accel, encoder_dwell=None)
-            self._movequeues_dwell(max(self.servo_dwell, self.servo_duration, 0))
+        self._movequeues_wait_moves(toolhead=True, mmu_toolhead=True)
         self.servo_angle = self.servo_angles['down']
         self.servo_state = self.SERVO_DOWN_STATE
 
@@ -3931,6 +3938,42 @@ class Mmu:
         except MmuError as ee:
             raise gcmd.error("_MMU_STEP_UNLOAD_GATE: %s" % str(ee))
 
+    cmd_MMU_STEP_UNLOAD_GATE_CUT_help = "User composable unloading step: Move filament from start of bowden and park in the gate"
+    def cmd_MMU_STEP_UNLOAD_GATE_CUT(self, gcmd):
+        self._log_to_file(gcmd.get_commandline())
+        full = gcmd.get_int('FULL', 0)
+        try:
+            self._unload_gate_cut(homing_max=self.calibrated_bowden_length if full else None)
+        except MmuError as ee:
+            raise gcmd.error("_MMU_STEP_UNLOAD_GATE_CUT: %s" % str(ee))
+        
+    cmd_MMU_CUT_help = "MMU cutter"
+    def cmd_MMU_CUT(self, gcmd):
+        self._servo_down()
+        if self.gate_homing_endstop == self.ENDSTOP_ENCODER:
+            self._trace_filament_move(None, -2, accel=self.gear_buzz_accel, encoder_dwell=None)
+            found = self._buzz_gear_motor()
+            if found:
+                self._servo_up()
+                raise gcmd.error("filament detected before it excision filament")
+            else:
+                self.gcode.run_script_from_command("_MMU_CUT")
+        else:
+            if sensor.runout_helper.filament_present:
+                self._servo_up()
+                raise gcmd.error("filament detected before it excision filament")
+            elif sensor.runout_helper.sensor_enabled:
+                self.gcode.run_script_from_command("_MMU_CUT")
+            else:
+                self._trace_filament_move(None, -2, accel=self.gear_buzz_accel, encoder_dwell=None)
+                found = self._buzz_gear_motor()
+                if found:
+                    self._servo_up()
+                    raise gcmd.error("filament detected before it excision filament")
+                else:
+                    self.gcode.run_script_from_command("_MMU_CUT")
+        self._servo_up()
+
     cmd_MMU_STEP_LOAD_BOWDEN_help = "User composable loading step: Smart loading of bowden"
     def cmd_MMU_STEP_LOAD_BOWDEN(self, gcmd):
         self._log_to_file(gcmd.get_commandline())
@@ -4115,6 +4158,56 @@ class Mmu:
                 self._log_debug("Did not home to gate sensor")
 
         raise MmuError("Unloading gate failed")
+    
+    def _unload_gate_cut(self, homing_max=None):
+        self._validate_gate_config("unload")
+        self._set_filament_direction(self.DIRECTION_UNLOAD)
+        self._servo_down()
+        full = homing_max == self.calibrated_bowden_length
+        homing_max = homing_max or self.gate_homing_max
+
+        # Safety step because this method is used as a defensive way to unload the entire bowden from unkown position
+        # It handles the small window where filament is between extruder entrance and toolhead sensor
+        if full and self._has_sensor(self.ENDSTOP_TOOLHEAD):
+            length = self.toolhead_extruder_to_nozzle - self.toolhead_sensor_to_nozzle
+            self._log_debug("Performing safety synced pre-unload bowden move")
+            _,_,_,delta = self._trace_filament_move("Bowden pre-unload move", -length, motor="gear+extruder")
+            homing_max -= length
+
+        if self.gate_homing_endstop == self.ENDSTOP_ENCODER:
+            with self._require_encoder():
+                self._log_debug("Slow unload of the encoder")
+                max_steps = int(homing_max / self.encoder_move_step_size) + 5
+                delta = 0.
+                for i in range(max_steps):
+                    msg = "Unloading step #%d from encoder" % (i+1)
+                    _,_,_,sdelta = self._trace_filament_move(msg, -self.encoder_move_step_size)
+                    delta += sdelta
+                    # Large enough delta here means we are out of the encoder
+                    if sdelta >= self.encoder_move_step_size * 0.2: # 20 %
+                        park = 0 - sdelta # Before the encoder
+                        self._set_filament_position(self._get_filament_position() + delta)
+                        _,_,measured,_ = self._trace_filament_move("Final parking", -park)
+                        self._set_filament_position(self._get_filament_position() + park)
+                        # We don't expect any movement of the encoder unless it is free-spinning
+                        if measured > self.encoder_min: # We expect 0, but relax the test a little (allow one pulse)
+                            self._log_info("Warning: Possible encoder malfunction (free-spinning) during final filament parking")
+                        self._set_filament_pos_state(self.FILAMENT_POS_UNLOADED)
+                        return
+                self._log_debug("Filament did not clear encoder even after moving %.1fmm" % (self.encoder_move_step_size * max_steps))
+        else:
+            _,homed,_,_ = self._trace_filament_move("Reverse homing to gate sensor", -homing_max, motor="gear", homing_move=-1, endstop_name=self.ENDSTOP_GATE)
+            if homed:
+                self._set_filament_pos_state(self.FILAMENT_POS_HOMED_GATE)
+                # Final parking step
+                self._trace_filament_move("Final parking", -0)
+                self._set_filament_pos_state(self.FILAMENT_POS_UNLOADED)
+                return
+            else:
+                self._log_debug("Did not home to gate sensor")
+
+        raise MmuError("Unloading gate failed")
+    
 
     # Shared gate functions to deduplicate logic
     def _validate_gate_config(self, direction):
@@ -6180,7 +6273,6 @@ class Mmu:
         self.toolhead_sensor_to_nozzle = gcmd.get_float('TOOLHEAD_SENSOR_TO_NOZZLE', self.toolhead_sensor_to_nozzle, minval=0.)
         self.toolhead_extruder_to_nozzle = gcmd.get_float('TOOLHEAD_EXTRUDER_TO_NOZZLE', self.toolhead_extruder_to_nozzle, minval=0.)
         self.toolhead_ooze_reduction = gcmd.get_float('TOOLHEAD_OOZE_REDUCTION', self.toolhead_ooze_reduction, minval=0.)
-        self.toolhead_post_load_tighten = gcmd.get_int('TOOLHEAD_POST_LOAD_TIGHTEN', self.toolhead_post_load_tighten, minval=0, maxval=1)
         self.gcode_load_sequence = gcmd.get_int('GCODE_LOAD_SEQUENCE', self.gcode_load_sequence, minval=0, maxval=1)
         self.gcode_unload_sequence = gcmd.get_int('GCODE_UNLOAD_SEQUENCE', self.gcode_unload_sequence, minval=0, maxval=1)
 
@@ -6287,7 +6379,6 @@ class Mmu:
         if self._has_sensor(self.ENDSTOP_EXTRUDER_ENTRY):
             msg += "\ntoolhead_entry_to_extruder = %.1f" % self.toolhead_entry_to_extruder
         msg += "\ntoolhead_ooze_reduction = %.1f" % self.toolhead_ooze_reduction
-        msg += "\ntoolhead_post_load_tighten = %d" % self.toolhead_post_load_tighten
         msg += "\ngcode_load_sequence = %d" % self.gcode_load_sequence
         msg += "\ngcode_unload_sequence = %d" % self.gcode_unload_sequence
 
@@ -6305,14 +6396,6 @@ class Mmu:
         msg += "\ntoolchange_retract = %.1f" % self.toolchange_retract
         msg += "\ntoolchange_retract_speed = %.1f" % self.toolchange_retract_speed
 
-        msg += "\n\nLOGGING:"
-        msg += "\nlog_level = %d" % self.log_level
-        msg += "\nlog_file_level = %d" % self.log_file_level
-        if self.mmu_logger:
-            msg += "\nlog_visual = %d" % self.log_visual
-        msg += "\nlog_statistics = %d" % self.log_statistics
-        msg += "\nconsole_gate_stat = %s" % self.console_gate_stat
-
         msg += "\n\nOTHER:"
         msg += "\nextruder_temp_variance = %.1f" % self.extruder_temp_variance
         if self._has_encoder():
@@ -6329,6 +6412,12 @@ class Mmu:
         msg += "\nretry_tool_change_on_error = %d" % self.retry_tool_change_on_error
         msg += "\nprint_start_detection = %d" % self.print_start_detection
         msg += "\nshow_error_dialog = %d" % self.show_error_dialog
+        msg += "\nlog_level = %d" % self.log_level
+        msg += "\nlog_file_level = %d" % self.log_file_level
+        if self.mmu_logger:
+            msg += "\nlog_visual = %d" % self.log_visual
+        msg += "\nlog_statistics = %d" % self.log_statistics
+        msg += "\nconsole_gate_stat = %s" % self.console_gate_stat
 
         msg += "\n\nCALIBRATION:"
         msg += "\nmmu_calibration_bowden_length = %.1f" % self.calibrated_bowden_length
