@@ -66,7 +66,11 @@ The module can be installed into an existing Klipper setup with the supplied ins
 
 ```
 cd ~
-git clone https://github.com/moggieuk/Happy-Hare.git
+mv Happy-Hare Happy-Hare.orig
+git clone https://github.com/CldyBnyhni/Happy-Hare-personalized.git Happy-Hare
+
+cd ~/Happy-Hare
+./install.sh -i
 ```
 
 <br>
