@@ -34,8 +34,20 @@ class MmuToolHead(toolhead.ToolHead, object):
             self.lookahead = toolhead.LookAheadQueue(self) # Happy Hare: Use base class LookAheadQueue
             self.lookahead.set_flush_time(toolhead.BUFFER_TIME_HIGH) # Happy Hare: Use base class
         else:
+            self.max_accel = config.getfloat('gear_max_accel', above=0.)
+            self.requested_accel_to_decel = config.getfloat(
+                'max_accel_to_decel', self.max_accel * 0.5, above=0.)
+            self.buffer_time_start = config.getfloat(
+                'buffer_time_start', 0.25, above=0.)
+            self.move_flush_time = config.getfloat(
+                'move_flush_time', 0.05, above=0.)
+            self.force_flush_time = self.last_kin_move_time = 0.
+            self.buffer_time_low = config.getfloat(
+                'buffer_time_low', 1, above=0.)
+            self.buffer_time_high = config.getfloat(
+                'buffer_time_high', 2, above=self.buffer_time_low)
             self.move_queue = toolhead.MoveQueue(self) # Happy Hare: Use base class MoveQueue (older klipper)
-            self.move_queue.set_flush_time(toolhead.BUFFER_TIME_HIGH) # Happy Hare: Use base class (older klipper)
+            self.move_queue.set_flush_time(self.buffer_time_high) # Happy Hare: Use base class (older klipper)
         self.commanded_pos = [0., 0., 0., 0.]
 
         self.gear_motion_queue = self.extruder_synced_to_gear = None # Happy Hare: For bi-directional syncing of gear and extruder

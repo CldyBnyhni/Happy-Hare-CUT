@@ -28,135 +28,6 @@ declare -A PIN 2>/dev/null || {
     exit 1
 }
 
-# Pins for original EASY-BRD and EASY-BRD with Seed Studio XIAO RP2040
-# Note: uart pin is shared on original EASY-BRD (with different uart addresses)
-#
-PIN[EASY-BRD,gear_uart_pin]="PA8";                         PIN[EASY-BRD-RP2040,gear_uart_pin]="gpio6"
-PIN[EASY-BRD,gear_step_pin]="PA4";                         PIN[EASY-BRD-RP2040,gear_step_pin]="gpio27"
-PIN[EASY-BRD,gear_dir_pin]="PA10";                         PIN[EASY-BRD-RP2040,gear_dir_pin]="gpio28"
-PIN[EASY-BRD,gear_enable_pin]="PA2";                       PIN[EASY-BRD-RP2040,gear_enable_pin]="gpio26"
-PIN[EASY-BRD,gear_diag_pin]="";                            PIN[EASY-BRD-RP2040,gear_diag_pin]=""
-PIN[EASY-BRD,selector_uart_pin]="PA8";                     PIN[EASY-BRD-RP2040,selector_uart_pin]="gpio6"
-PIN[EASY-BRD,selector_step_pin]="PA9";                     PIN[EASY-BRD-RP2040,selector_step_pin]="gpio7"
-PIN[EASY-BRD,selector_dir_pin]="PB8";                      PIN[EASY-BRD-RP2040,selector_dir_pin]="gpio0"
-PIN[EASY-BRD,selector_enable_pin]="PA11";                  PIN[EASY-BRD-RP2040,selector_enable_pin]="gpio29"
-PIN[EASY-BRD,selector_diag_pin]="PA7";                     PIN[EASY-BRD-RP2040,selector_diag_pin]="gpio2"
-PIN[EASY-BRD,selector_endstop_pin]="PB9";                  PIN[EASY-BRD-RP2040,selector_endstop_pin]="gpio1"
-PIN[EASY-BRD,servo_pin]="PA5";                             PIN[EASY-BRD-RP2040,servo_pin]="gpio4"
-PIN[EASY-BRD,encoder_pin]="PA6";                           PIN[EASY-BRD-RP2040,encoder_pin]="gpio3"
-PIN[EASY-BRD,neopixel_pin]="";                             PIN[EASY-BRD-RP2040,neopixel_pin]=""
-PIN[EASY-BRD,gate_sensor_pin]="PA6";                       PIN[EASY-BRD-RP2040,gate_sensor_pin]="gpio3";
-PIN[EASY-BRD,pre_gate_0_pin]="";                           PIN[EASY-BRD-RP2040,pre_gate_0_pin]="";
-PIN[EASY-BRD,pre_gate_1_pin]="";                           PIN[EASY-BRD-RP2040,pre_gate_1_pin]="";
-PIN[EASY-BRD,pre_gate_2_pin]="";                           PIN[EASY-BRD-RP2040,pre_gate_2_pin]="";
-PIN[EASY-BRD,pre_gate_3_pin]="";                           PIN[EASY-BRD-RP2040,pre_gate_3_pin]="";
-PIN[EASY-BRD,pre_gate_4_pin]="";                           PIN[EASY-BRD-RP2040,pre_gate_4_pin]="";
-PIN[EASY-BRD,pre_gate_5_pin]="";                           PIN[EASY-BRD-RP2040,pre_gate_5_pin]="";
-PIN[EASY-BRD,pre_gate_6_pin]="";                           PIN[EASY-BRD-RP2040,pre_gate_6_pin]="";
-PIN[EASY-BRD,pre_gate_7_pin]="";                           PIN[EASY-BRD-RP2040,pre_gate_7_pin]="";
-PIN[EASY-BRD,pre_gate_8_pin]="";                           PIN[EASY-BRD-RP2040,pre_gate_8_pin]="";
-PIN[EASY-BRD,pre_gate_9_pin]="";                           PIN[EASY-BRD-RP2040,pre_gate_9_pin]="";
-PIN[EASY-BRD,pre_gate_10_pin]="";                          PIN[EASY-BRD-RP2040,pre_gate_10_pin]="";
-PIN[EASY-BRD,pre_gate_11_pin]="";                          PIN[EASY-BRD-RP2040,pre_gate_11_pin]="";
-
-# Pins for Mellow EASY-BRD with CANbus (original v1.x and v2)
-#
-PIN[MELLOW-EASY-BRD-CAN,gear_uart_pin]="gpio9";            PIN[MELLOW-EASY-BRD-CANv2,gear_uart_pin]="gpio9";
-PIN[MELLOW-EASY-BRD-CAN,gear_step_pin]="gpio7";            PIN[MELLOW-EASY-BRD-CANv2,gear_step_pin]="gpio7";
-PIN[MELLOW-EASY-BRD-CAN,gear_dir_pin]="gpio8";             PIN[MELLOW-EASY-BRD-CANv2,gear_dir_pin]="gpio8";
-PIN[MELLOW-EASY-BRD-CAN,gear_enable_pin]="gpio6";          PIN[MELLOW-EASY-BRD-CANv2,gear_enable_pin]="gpio6";
-PIN[MELLOW-EASY-BRD-CAN,gear_diag_pin]="gpio23";           PIN[MELLOW-EASY-BRD-CANv2,gear_diag_pin]="";               # v2: Dup with encoder (gpio15)
-PIN[MELLOW-EASY-BRD-CAN,selector_uart_pin]="gpio0";        PIN[MELLOW-EASY-BRD-CANv2,selector_uart_pin]="gpio2";
-PIN[MELLOW-EASY-BRD-CAN,selector_step_pin]="gpio2";        PIN[MELLOW-EASY-BRD-CANv2,selector_step_pin]="gpio4";
-PIN[MELLOW-EASY-BRD-CAN,selector_dir_pin]="gpio1";         PIN[MELLOW-EASY-BRD-CANv2,selector_dir_pin]="gpio3";
-PIN[MELLOW-EASY-BRD-CAN,selector_enable_pin]="gpio3";      PIN[MELLOW-EASY-BRD-CANv2,selector_enable_pin]="gpio5";
-PIN[MELLOW-EASY-BRD-CAN,selector_diag_pin]="gpio22";       PIN[MELLOW-EASY-BRD-CANv2,selector_diag_pin]="gpio20";     # v2: Dup with endstop (gpio20)
-PIN[MELLOW-EASY-BRD-CAN,selector_endstop_pin]="gpio20";	   PIN[MELLOW-EASY-BRD-CANv2,selector_endstop_pin]="gpio20";  # Endstop
-PIN[MELLOW-EASY-BRD-CAN,servo_pin]="gpio21";		   PIN[MELLOW-EASY-BRD-CANv2,servo_pin]="gpio21";             # Servo
-PIN[MELLOW-EASY-BRD-CAN,encoder_pin]="gpio15";		   PIN[MELLOW-EASY-BRD-CANv2,encoder_pin]="gpio15";           # Encoder
-PIN[MELLOW-EASY-BRD-CAN,neopixel_pin]="gpio14";		   PIN[MELLOW-EASY-BRD-CANv2,neopixel_pin]="gpio14";          # v1: Extra  / v2: RGB
-PIN[MELLOW-EASY-BRD-CAN,gate_sensor_pin]="gpio15";	   PIN[MELLOW-EASY-BRD-CANv2,gate_sensor_pin]="gpio15";       # Encoder (Alt)
-PIN[MELLOW-EASY-BRD-CAN,pre_gate_0_pin]="gpio10";	   PIN[MELLOW-EASY-BRD-CANv2,pre_gate_0_pin]="gpio24";        # v1: Exp 5  / v2: Exp 3
-PIN[MELLOW-EASY-BRD-CAN,pre_gate_1_pin]="gpio26";	   PIN[MELLOW-EASY-BRD-CANv2,pre_gate_1_pin]="gpio22";        # v1: Exp 6  / v2: Exp 4
-PIN[MELLOW-EASY-BRD-CAN,pre_gate_2_pin]="gpio11";	   PIN[MELLOW-EASY-BRD-CANv2,pre_gate_2_pin]="gpio25";        # v1: Exp 7  / v2: Exp 5
-PIN[MELLOW-EASY-BRD-CAN,pre_gate_3_pin]="gpio27";	   PIN[MELLOW-EASY-BRD-CANv2,pre_gate_3_pin]="gpio23";        # v1: Exp 8  / v2: Exp 6
-PIN[MELLOW-EASY-BRD-CAN,pre_gate_4_pin]="gpio12";	   PIN[MELLOW-EASY-BRD-CANv2,pre_gate_4_pin]="gpio13";        # v1: Exp 9  / v2: Exp 7
-PIN[MELLOW-EASY-BRD-CAN,pre_gate_5_pin]="gpio28";	   PIN[MELLOW-EASY-BRD-CANv2,pre_gate_5_pin]="gpio26";        # v1: Exp 10 / v2: Exp 8
-PIN[MELLOW-EASY-BRD-CAN,pre_gate_6_pin]="gpio24";	   PIN[MELLOW-EASY-BRD-CANv2,pre_gate_6_pin]="gpio12";        # v1: Exp 11 / v2: Exp 9
-PIN[MELLOW-EASY-BRD-CAN,pre_gate_7_pin]="gpio29";	   PIN[MELLOW-EASY-BRD-CANv2,pre_gate_7_pin]="gpio27";        # v1: Exp 12 / v2: Exp 10
-PIN[MELLOW-EASY-BRD-CAN,pre_gate_8_pin]="gpio13";	   PIN[MELLOW-EASY-BRD-CANv2,pre_gate_8_pin]="gpio11";        # v1: Exp 13 / v2: Exp 11
-PIN[MELLOW-EASY-BRD-CAN,pre_gate_9_pin]="gpio25";	   PIN[MELLOW-EASY-BRD-CANv2,pre_gate_9_pin]="gpio28";        # v1: Exp 14 / v2: Exp 12
-PIN[MELLOW-EASY-BRD-CAN,pre_gate_10_pin]="";               PIN[MELLOW-EASY-BRD-CANv2,pre_gate_10_pin]="gpio10";       #              v2: Exp 13
-PIN[MELLOW-EASY-BRD-CAN,pre_gate_11_pin]="";               PIN[MELLOW-EASY-BRD-CANv2,pre_gate_11_pin]="gpio29";       #              v2: Exp 14
-
-# Pins for Fysetc Burrows ERB board (original v1 and v2)
-#
-PIN[ERB,gear_uart_pin]="gpio20";                           PIN[ERBv2,gear_uart_pin]="gpio20";
-PIN[ERB,gear_step_pin]="gpio10";                           PIN[ERBv2,gear_step_pin]="gpio10";
-PIN[ERB,gear_dir_pin]="gpio9";                             PIN[ERBv2,gear_dir_pin]="gpio9";
-PIN[ERB,gear_enable_pin]="gpio8";                          PIN[ERBv2,gear_enable_pin]="gpio8";
-PIN[ERB,gear_diag_pin]="gpio13";                           PIN[ERBv2,gear_diag_pin]="gpio13";
-PIN[ERB,selector_uart_pin]="gpio17";                       PIN[ERBv2,selector_uart_pin]="gpio17";
-PIN[ERB,selector_step_pin]="gpio16";                       PIN[ERBv2,selector_step_pin]="gpio16";
-PIN[ERB,selector_dir_pin]="gpio15";                        PIN[ERBv2,selector_dir_pin]="gpio15";
-PIN[ERB,selector_enable_pin]="gpio14";                     PIN[ERBv2,selector_enable_pin]="gpio14";
-PIN[ERB,selector_diag_pin]="gpio19";                       PIN[ERBv2,selector_diag_pin]="gpio19";
-PIN[ERB,selector_endstop_pin]="gpio24";                    PIN[ERBv2,selector_endstop_pin]="gpio24";
-PIN[ERB,servo_pin]="gpio23";                               PIN[ERBv2,servo_pin]="gpio23";
-PIN[ERB,encoder_pin]="gpio22";                             PIN[ERBv2,encoder_pin]="gpio22";
-PIN[ERB,neopixel_pin]="gpio21";                            PIN[ERBv2,neopixel_pin]="gpio21";
-PIN[ERB,gate_sensor_pin]="gpio22";                         PIN[ERBv2,gate_sensor_pin]="gpio25";  # Hall Effect
-PIN[ERB,pre_gate_0_pin]="gpio0";                           PIN[ERBv2,pre_gate_0_pin]="gpio12";
-PIN[ERB,pre_gate_1_pin]="gpio1";                           PIN[ERBv2,pre_gate_1_pin]="gpio18";
-PIN[ERB,pre_gate_2_pin]="gpio2";                           PIN[ERBv2,pre_gate_2_pin]="gpio2";
-PIN[ERB,pre_gate_3_pin]="gpio3";                           PIN[ERBv2,pre_gate_3_pin]="gpio3";
-PIN[ERB,pre_gate_4_pin]="gpio4";                           PIN[ERBv2,pre_gate_4_pin]="gpio4";
-PIN[ERB,pre_gate_5_pin]="gpio5";                           PIN[ERBv2,pre_gate_5_pin]="gpio5";
-PIN[ERB,pre_gate_6_pin]="gpio6";                           PIN[ERBv2,pre_gate_6_pin]="gpio6";
-PIN[ERB,pre_gate_7_pin]="gpio7";                           PIN[ERBv2,pre_gate_7_pin]="gpio7";
-PIN[ERB,pre_gate_8_pin]="gpio26";                          PIN[ERBv2,pre_gate_8_pin]="gpio26";
-PIN[ERB,pre_gate_9_pin]="gpio27";                          PIN[ERBv2,pre_gate_9_pin]="gpio27";
-PIN[ERB,pre_gate_10_pin]="gpio28";                         PIN[ERBv2,pre_gate_10_pin]="gpio28";
-PIN[ERB,pre_gate_11_pin]="gpio29";                         PIN[ERBv2,pre_gate_11_pin]="gpio29";
-
-# Pins for BTT MMB board (gear on motor1, selector on motor2, endstop on STP11, optional gate sensor on STP1 if no gear DIAG use)
-# Note BTT MMB v1.1 Board switched gear_enable and pre_gate_1 pins
-#
-PIN[MMB10,gear_uart_pin]="PA10";                           PIN[MMB11,gear_uart_pin]="PA10";       # M1
-PIN[MMB10,gear_step_pin]="PB15";                           PIN[MMB11,gear_step_pin]="PB15";
-PIN[MMB10,gear_dir_pin]="PB14";                            PIN[MMB11,gear_dir_pin]="PB14";
-PIN[MMB10,gear_enable_pin]="PA8";                          PIN[MMB11,gear_enable_pin]="PB8";
-PIN[MMB10,gear_diag_pin]="PA3";                            PIN[MMB11,gear_diag_pin]="PA3";        # Aka STP1
-PIN[MMB10,selector_uart_pin]="PC7";                        PIN[MMB11,selector_uart_pin]="PC7";    # M2
-PIN[MMB10,selector_step_pin]="PD2";                        PIN[MMB11,selector_step_pin]="PD2";
-PIN[MMB10,selector_dir_pin]="PB13";                        PIN[MMB11,selector_dir_pin]="PB13";
-PIN[MMB10,selector_enable_pin]="PD1";                      PIN[MMB11,selector_enable_pin]="PD1";
-PIN[MMB10,selector_diag_pin]="PA4";                        PIN[MMB11,selector_diag_pin]="PA4";    # Aka STP2
-PIN[MMB10,selector_endstop_pin]="PB2";                     PIN[MMB11,selector_endstop_pin]="PB2"; # STP11
-PIN[MMB10,servo_pin]="PA0";                                PIN[MMB11,servo_pin]="PA0";
-PIN[MMB10,encoder_pin]="PA1";                              PIN[MMB11,encoder_pin]="PA1";
-PIN[MMB10,neopixel_pin]="PA2";                             PIN[MMB11,neopixel_pin]="PA2";
-PIN[MMB10,gate_sensor_pin]="PA3";                          PIN[MMB11,gate_sensor_pin]="PA3";      # STP1 (if not DIAG)
-PIN[MMB10,pre_gate_0_pin]="PB9";                           PIN[MMB11,pre_gate_0_pin]="PB9";       # STP3
-PIN[MMB10,pre_gate_1_pin]="PB8";                           PIN[MMB11,pre_gate_1_pin]="PA8";       # STP4
-PIN[MMB10,pre_gate_2_pin]="PC15";                          PIN[MMB11,pre_gate_2_pin]="PC15";      # STP5
-PIN[MMB10,pre_gate_3_pin]="PC13";                          PIN[MMB11,pre_gate_3_pin]="PC13";      # STP6
-PIN[MMB10,pre_gate_4_pin]="PC14";                          PIN[MMB11,pre_gate_4_pin]="PC14";      # STP7
-PIN[MMB10,pre_gate_5_pin]="PB12";                          PIN[MMB11,pre_gate_5_pin]="PB12";      # STP8
-PIN[MMB10,pre_gate_6_pin]="PB11";                          PIN[MMB11,pre_gate_6_pin]="PB11";      # STP9
-PIN[MMB10,pre_gate_7_pin]="PB10";                          PIN[MMB11,pre_gate_7_pin]="PB10";      # STP10
-PIN[MMB10,pre_gate_8_pin]="";                              PIN[MMB11,pre_gate_8_pin]="";
-PIN[MMB10,pre_gate_9_pin]="";                              PIN[MMB11,pre_gate_9_pin]="";
-PIN[MMB10,pre_gate_10_pin]="";                             PIN[MMB11,pre_gate_10_pin]="";
-PIN[MMB10,pre_gate_11_pin]="";                             PIN[MMB11,pre_gate_11_pin]="";
-
-# These pins will usually be on main mcu for wiring simplification
-#
-PIN[toolhead_sensor_pin]=""
-PIN[extruder_sensor_pin]=""
-PIN[gantry_servo_pin]=""
-PIN[sync_feedback_tension_pin]=""
-PIN[sync_feedback_compression_pin]=""
 
 # Screen Colors
 OFF='\033[0m'             # Text Reset
@@ -1116,9 +987,14 @@ install_printer_includes() {
                 fi
             fi
             for i in '\[include mmu/base/\*.cfg\]' ; do
-                already_included=$(grep -c "${i}" ${dest} || true)
+                already_included=$(grep -c "${i}" "${dest}" || true)
                 if [ "${already_included}" -eq 0 ]; then
-                    sed -i "1i ${i}" ${dest}
+                    sed -i "1i ${i}" "${dest}"
+                else
+                    # Check if already commented out
+                    if grep -q "^#.*${i}" "${dest}"; then
+                        sed -i "s%^#.*${i}%${i}%" "${dest}"
+                    fi
                 fi
             done
         fi
@@ -1145,6 +1021,7 @@ uninstall_printer_includes() {
             /\[include mmu\/mmu_sequence.cfg\]/ d; \
             /\[include mmu\/mmu_form_tip.cfg\]/ d; \
             /\[include mmu\/mmu_cut_tip.cfg\]/ d; \
+            /\[include mmu\/mmu_cut.cfg\]/ d; \
             /\[include mmu\/mmu.cfg\]/ d; \
             /\[include mmu\/base\/\*.cfg\]/ d; \
             /\[include mmu\/addon\/\*.cfg\]/ d; \
@@ -1186,7 +1063,7 @@ install_update_manager() {
         # Quick "catch-up" update for new toolchange_next_pos pre-processing
         update_section=$(grep -c 'enable_toolchange_next_pos' ${file} || true)
         if [ "${update_section}" -eq 0 ]; then
-            awk '/^enable_file_preprocessor/ {print $0 "\nenable_toolchange_next_pos: True\n"; next} {print}' ${file} > ${file}.tmp && mv ${file}.tmp ${file}
+            awk '/^enable_file_preprocessor/ {print $0 "\nenable_toolchange_next_pos: False\n"; next} {print}' ${file} > ${file}.tmp && mv ${file}.tmp ${file}
             restart=1
             echo -e "${WARNING}Added new 'enable_toolchange_next_pos' to moonraker.conf"
         fi
@@ -1280,111 +1157,6 @@ prompt_123() {
 }
 
 questionaire() {
-    # Set default substitution tokens
-    mmu_vendor="Other"
-    mmu_version="1.0"
-    extruder_homing_endstop="collision"
-    gate_homing_endstop="encoder"
-    gate_parking_distance=23.0
-    gate_endstop_to_encoder=0
-    servo_buzz_gear_on_down=0
-    servo_always_active=0
-    servo_duration=0.2
-
-    # mmu_hardware.cfg only...
-    gear_gear_ratio="80:20"
-    gear_run_current=0.5
-    gear_hold_current=0.1
-    sel_run_current=0.4
-    sel_hold_current=0.2
-    maximum_servo_angle=180
-    minimum_pulse_width=0.001
-    maximum_pulse_width=0.002
-
-    echo
-    echo -e "${INFO}Let me see if I can get you started with initial configuration"
-    echo -e "You will still have some manual editing to perform but I will explain that later"
-    echo -e "(Note that all this script does is set a lot of the time consuming parameters in the config"
-    echo
-    echo -e "${PROMPT}${SECTION}What type of MMU are you running?${INPUT}"
-    echo -e "1) ERCF v1.1 (inc TripleDecky, Springy, Binky mods)"
-    echo -e "2) ERCF v2.0"
-    echo -e "3) Tradrack v1.0"
-    echo -e "4) Other (or just want starter config files)"
-    num=$(prompt_123 "MMU Type?" 4)
-    echo
-    case $num in
-        1)
-            HAS_ENCODER=yes
-            mmu_vendor="ERCF"
-            mmu_version="1.1"
-            servo_buzz_gear_on_down=3
-
-            echo
-            echo -e "${PROMPT}Some popular upgrade options for ERCF v1.1 can automatically be setup. Let me ask you about them...${INPUT}"
-            yn=$(prompt_yn "Are you using the 'Springy' sprung servo selector cart")
-            echo
-            case $yn in
-            y)
-                mmu_version+="s"
-                ;;
-            esac
-            yn=$(prompt_yn "Are you using the improved 'Binky' encoder")
-            echo
-            case $yn in
-            y)
-                mmu_version+="b"
-                ;;
-            esac
-            yn=$(prompt_yn "Are you using the wider 'Triple-Decky' filament blocks")
-            echo
-            case $yn in
-            y)
-                mmu_version+="t"
-                ;;
-            esac
-            ;;
-        2)
-            HAS_ENCODER=yes
-            mmu_vendor="ERCF"
-            mmu_version="2.0"
-            gate_parking_distance=13.0 # ThumperBlocks is 11.0
-            servo_buzz_gear_on_down=3
-            ;;
-        3)
-            HAS_ENCODER=no
-            mmu_vendor="Tradrack"
-            mmu_version="1.0"
-            extruder_homing_endstop="none"
-            gate_homing_endstop="mmu_gate"
-            gate_parking_distance=17.5
-            servo_buzz_gear_on_down=0
-
-            gear_gear_ratio="50:17"
-            gear_run_current=1.27
-            gear_hold_current=0.2
-            sel_run_current=0.63
-            sel_hold_current=0.2
-            echo -e "${PROMPT}Some popular upgrade options for Tradrack v1.0 can automatically be setup. Let me ask you about them...${INPUT}"
-            yn=$(prompt_yn "Are you using the 'Binky' encoder modification")
-            echo
-            case $yn in
-            y)
-                HAS_ENCODER=yes
-                mmu_version+="e"
-                extruder_homing_endstop="collision"
-                gate_homing_endstop="encoder"
-                gate_parking_distance=48.0
-                gate_endstop_to_encoder=31.0
-                ;;
-            esac
-            ;;
-        4)
-            HAS_ENCODER=yes
-            echo
-            echo -e "${WARNING}    IMPORTANT: Since you have a custom MMU you will need to setup some CAD dimensions and other key parameters... See doc"
-            ;;
-    esac
 
     mmu_num_gates=12
     echo
@@ -1400,316 +1172,100 @@ questionaire() {
     mmu_num_leds=$(expr $mmu_num_gates + 1)
 
     brd_type="unknown"
-    echo
-    echo -e "${PROMPT}${SECTION}Select mcu board type used to control MMU${INPUT}"
-    echo -e " 1) BTT MMB v1.0 (with CANbus)"
-    echo -e " 2) BTT MMB v1.1 (with CANbus)"
-    echo -e " 3) Fysetc Burrows ERB v1"
-    echo -e " 4) Fysetc Burrows ERB v2"
-    echo -e " 5) Standard EASY-BRD (with SAMD21)"
-    echo -e " 6) EASY-BRD with RP2040"
-    echo -e " 7) Mellow EASY-BRD v1.x (with CANbus)"
-    echo -e " 8) Mellow EASY-BRD v2.x (with CANbus)"
-    echo -e " 9) Not in list / Unknown"
-    num=$(prompt_123 "MCU type?" 9)
-    echo
-    case $num in
-        1)
-            brd_type="MMB10"
-            pattern="Klipper_stm32"
-            ;;
-        2)
-            brd_type="MMB11"
-            pattern="Klipper_stm32"
-            ;;
-        3)
-            brd_type="ERB"
-            pattern="Klipper_rp2040"
-            ;;
-        4)
-            brd_type="ERBv2"
-            pattern="Klipper_rp2040"
-            ;;
-        5)
-            brd_type="EASY-BRD"
-            pattern="Klipper_samd21"
-            ;;
-        6)
-            brd_type="EASY-BRD-RP2040"
-            pattern="Klipper_rp2040"
-            ;;
-        7)
-            brd_type="MELLOW-EASY-BRD-CAN"
-            pattern="Klipper_rp2040"
-            ;;
-        8)
-            brd_type="MELLOW-EASY-BRD-CANv2"
-            pattern="Klipper_rp2040"
-            ;;
-        9)
-            brd_type="unknown"
-            pattern="Klipper_"
-            ;;
-    esac
-
+    
+# Initialize serial variable
     serial=""
+
+    # Search for serial devices in /dev/serial/by-id matching the specified pattern
     echo
-    for line in `ls /dev/serial/by-id 2>/dev/null | grep -E "Klipper_"`; do
-        if echo ${line} | grep --quiet "${pattern}"; then
-            echo -e "${PROMPT}${SECTION}This looks like your ${EMPHASIZE}${brd_type}${PROMPT} controller serial port. Is that correct?${INPUT}"
-            yn=$(prompt_yn "/dev/serial/by-id/${line}")
-            echo
-            case $yn in
-                y)
-                    serial="/dev/serial/by-id/${line}"
+    for line in $(ls /dev/serial/by-id 2>/dev/null | grep -E "Klipper_rp2040"); do
+        new_serial="/dev/serial/by-id/${line}"
+
+        # Check if this serial matches any existing serial in printer.cfg
+        found_match=false
+        while IFS= read -r cfg_line; do
+            if [[ $cfg_line =~ ^serial:\ (.*) ]]; then
+                matched_serial="${BASH_REMATCH[1]}"
+                if [ "${new_serial}" == "${matched_serial}" ]; then
+                    found_match=true
                     break
-                    ;;
-                n)
-                    ;;
-            esac
+                fi
+            fi
+        done < "${HOME}/printer_data/config/printer.cfg"
+
+        # If no match found, use this serial as the chosen one
+        if ! $found_match; then
+            serial="${new_serial}"
+            break
         fi
     done
+
+    if [ "${serial}" == "" ]; then
+        for line in $(ls /dev/serial/by-path 2>/dev/null | grep -E "platform" | grep -E "port0"); do
+            new_serial="/dev/serial/by-path/${line}"
+
+            # Check if this serial matches any existing serial in printer.cfg
+            found_match=false
+            while IFS= read -r cfg_line; do
+                if [[ $cfg_line =~ ^serial:\ (.*) ]]; then
+                    matched_serial="${BASH_REMATCH[1]}"
+                    if [ "${new_serial}" == "${matched_serial}" ]; then
+                        found_match=true
+                        break
+                    fi
+                fi
+            done < "${HOME}/printer_data/config/printer.cfg"
+
+            # If no match found, use this serial as the chosen one
+            if ! $found_match; then
+                serial="${new_serial}"
+                break
+            fi
+        done
+    fi
+
+    if [ "${serial}" == "" ]; then
+        for line in $(ls /dev/serial/by-id 2>/dev/null | grep -E "Klipper_stm32"); do
+            new_serial="/dev/serial/by-id/${line}"
+
+            # Check if this serial matches any existing serial in printer.cfg
+            found_match=false
+            while IFS= read -r cfg_line; do
+                if [[ $cfg_line =~ ^serial:\ (.*) ]]; then
+                    matched_serial="${BASH_REMATCH[1]}"
+                    if [ "${new_serial}" == "${matched_serial}" ]; then
+                        found_match=true
+                        break
+                    fi
+                fi
+            done < "${HOME}/printer_data/config/printer.cfg"
+
+            # If no match found, use this serial as the chosen one
+            if ! $found_match; then
+                serial="${new_serial}"
+                break
+            fi
+        done
+    fi
+
+    # If no matching device is found, set a default value and display a warning
     if [ "${serial}" == "" ]; then
         echo
         echo -e "${WARNING}    Couldn't find your serial port, but no worries - I'll configure the default and you can manually change later"
         serial='/dev/ttyACM1 # Config guess. Run ls -l /dev/serial/by-id and set manually'
     fi
 
-    # Avoid pin duplication
-    if [ "${HAS_ENCODER}" == "yes" ]; then
-        eval PIN[${brd_type},gate_sensor_pin]=""
-    else
-        eval PIN[${brd_type},encoder_pin]=""
-    fi
-
-    echo
-    echo -e "${PROMPT}${SECTION}Touch selector operation using TMC Stallguard? This allows for additional selector recovery steps but is difficult to tune"
-    echo -e "Not recommend if you are new to MMU/Happy Hare & MCU must have DIAG output for steppers. Can configure later${INPUT}"
-    yn=$(prompt_yn "Enable selector touch operation")
-    echo
-    case $yn in
-        y)
-            if [ "${brd_type}" == "EASY-BRD" ]; then
-                echo
-                echo -e "${WARNING}    IMPORTANT: Set the J6 jumper pins to 2-3 and 4-5, i.e. .[..][..]  MAKE A NOTE NOW!!"
-            fi
-            SETUP_SELECTOR_TOUCH=1
-            ;;
-        n)
-            if [ "${brd_type}" == "EASY-BRD" ]; then
-                echo
-                echo -e "${WARNING}    IMPORTANT: Set the J6 jumper pins to 1-2 and 4-5, i.e. [..].[..]  MAKE A NOTE NOW!!"
-            fi
-            SETUP_SELECTOR_TOUCH=0
-            ;;
-    esac
-
-    echo
-    echo -e "${PROMPT}${SECTION}Would you like to have neopixel LEDs setup now for your MMU?${INPUT}"
-    yn=$(prompt_yn "Enable LED support?")
-    echo
-    case $yn in
-        y)
-            SETUP_LED=1
-            ;;
-        n)
-            SETUP_LED=0
-            ;;
-    esac
-
-    if [ "${mmu_vendor}" == "ERCF" ]; then
-        maximum_servo_angle=180
-        minimum_pulse_width=0.00085
-        maximum_pulse_width=0.00215
-
-        echo
-        echo -e "${PROMPT}${SECTION}Which servo are you using?"
-        echo -e "1) MG-90S"
-        echo -e "2) Savox SH0255MG"
-        echo -e "3) GDW DS041MG"
-        echo -e "4) Not listed / Other${INPUT}"
-        num=$(prompt_123 "Servo?" 4)
-        echo
-        case $num in
-            1)
-                # MG-90S
-                servo_up_angle=30
-                if [ "${mmu_version}" == "2.0" ]; then
-                    servo_move_angle=61
-                else
-                    servo_move_angle=${servo_up_angle}
-                fi
-                servo_down_angle=140
-                ;;
-            2)
-                # Savox SH0255MG
-                servo_up_angle=140
-                if [ "${mmu_version}" == "2.0" ]; then
-                    servo_move_angle=109
-                else
-                    servo_move_angle=${servo_up_angle}
-                fi
-                servo_down_angle=30
-                ;;
-            3)
-                # GDW DS041MG
-                servo_always_active=1
-                maximum_servo_angle=180
-                minimum_pulse_width=0.00050
-                maximum_pulse_width=0.00250
-                servo_up_angle=30
-                if [ "${mmu_version}" == "2.0" ]; then
-                    servo_move_angle=50
-                else
-                    servo_move_angle=${servo_up_angle}
-                fi
-                servo_down_angle=100
-        esac
-
-    elif [ "${mmu_vendor}" == "Tradrack" ]; then
-        maximum_servo_angle=131
-        minimum_pulse_width=0.00070
-        maximum_pulse_width=0.00220
-
-        echo
-        echo -e "${PROMPT}${SECTION}Which servo are you using?"
-        echo -e "1) PS-1171MG or FT1117M (Tradrack)"
-        echo -e "2) Not listed / Other${INPUT}"
-        num=$(prompt_123 "Servo?" 2)
-        echo
-        case $num in
-            1)
-                servo_up_angle=145
-                servo_move_angle=${servo_up_angle}
-                servo_down_angle=1
-                ;;
-        esac
-
-    else
-        servo_up_angle=0
-        servo_move_angle=0
-        servo_down_angle=0
-    fi
-
-    if [ "${mmu_vendor}" == "ERCF" -o "${HAS_ENCODER}" == "yes" ]; then
-        echo
-        echo -e "${PROMPT}${SECTION}Clog detection? This uses the MMU encoder movement to detect clogs and can call your filament runout logic${INPUT}"
-        yn=$(prompt_yn "Enable clog detection")
-        echo
-        case $yn in
-            y)
-                enable_clog_detection=1
-                echo -e "${PROMPT}    Would you like MMU to automatically adjust clog detection length (recommended)?${INPUT}"
-                yn=$(prompt_yn "    Automatic")
-                echo
-                if [ "${yn}" == "y" ]; then
-                    enable_clog_detection=2
-                fi
-                ;;
-            n)
-                enable_clog_detection=0
-                ;;
-        esac
-    else
-        enable_clog_detection=0
-    fi
-
-    echo
-    echo -e "${PROMPT}${SECTION}EndlessSpool? This uses filament runout detection to automate switching to new spool without interruption${INPUT}"
-    yn=$(prompt_yn "Enable EndlessSpool")
-    echo
-    case $yn in
-        y)
-            enable_endless_spool=1
-            ;;
-        n)
-            enable_endless_spool=0
-            ;;
-    esac
-
     echo
     MENU_12864=0
     ERCF_COMPAT=0
-    echo -e "${PROMPT}${SECTION}Finally, would you like me to include all the MMU config files into your ${PRINTER_CONFIG} file${INPUT}"
-    yn=$(prompt_yn "Add include?")
-    echo
-    case $yn in
-        y)
-            INSTALL_PRINTER_INCLUDES=1
-            echo -e "${PROMPT}    Would you like to include Mini 12864 menu configuration extension for MMU${INPUT}"
-            yn=$(prompt_yn "    Include menu")
-            echo
-            case $yn in
-                y)
-                    MENU_12864=1
-                    ;;
-                n)
-                    MENU_12864=0
-                    ;;
-            esac
-
-            echo -e "${PROMPT}    Would you like to include subset of the legacy ERCF_ command set compatibility module${INPUT}"
-            yn=$(prompt_yn "    Include legacy ERCF command set (not recommended)")
-            echo
-            case $yn in
-                y)
-                    ERCF_COMPAT=1
-                    ;;
-                n)
-                    ERCF_COMPAT=0
-                    ;;
-            esac
-
-            echo -e "${PROMPT}    Would you like to include the default pause/resume macros supplied with Happy Hare${INPUT}"
-            yn=$(prompt_yn "    Include client_macros.cfg")
-            echo
-            case $yn in
-                y)
-                    CLIENT_MACROS=1
-                    ;;
-                n)
-                    CLIENT_MACROS=0
-                    ;;
-            esac
-
-            echo -e "${PROMPT}    Addons: Would you like to include the EREC filament cutter macro (requires EREC servo installation)${INPUT}"
-            yn=$(prompt_yn "    Include mmu_erec_cutter.cfg")
-            echo
-            case $yn in
-                y)
-                    ADDONS_EREC=1
-                    ;;
-                n)
-                    ADDONS_EREC=0
-                    ;;
-            esac
-
-            echo -e "${PROMPT}    Addons: Would you like to include the Blobifier purge system (requires Blobifier servo installation)${INPUT}"
-            yn=$(prompt_yn "    Include blobifier.cfg")
-            echo
-            case $yn in
-                y)
-                    ADDONS_BLOBIFIER=1
-                    ;;
-                n)
-                    ADDONS_BLOBIFIER=0
-                    ;;
-            esac
-	    ;;
-        n)
-            INSTALL_PRINTER_INCLUDES=0
-            ;;
-    esac
-
+    INSTALL_PRINTER_INCLUDES=1
+    CLIENT_MACROS=0
+    ADDONS_EREC=0
+    ADDONS_BLOBIFIER=0
     echo -e "${WARNING}"
     echo -e "mmu_vendor: ${mmu_vendor}"
     echo -e "mmu_version: ${mmu_version}"
     echo -e "mmu_num_gates: ${mmu_num_gates}"
-    echo -e "servo_up_angle: ${servo_up_angle}"
-    echo -e "servo_move_angle: ${servo_move_angle}"
-    echo -e "servo_down_angle: ${servo_down_angle}"
-    echo -e "enable_clog_detection: ${enable_clog_detection}"
-    echo -e "enable_endless_spool: ${enable_endless_spool}"
 
     echo
     echo -e "${INFO}"
