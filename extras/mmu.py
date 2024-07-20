@@ -30,10 +30,10 @@ UI_EMOTICONS = ['?', 'A+', 'A', 'B', 'C', 'C-', 'D', 'F']
 if sys.version_info[0] >= 3:
     # Use (common) unicode for improved formatting and klipper layout
     UI_SPACE, UI_SEPARATOR, UI_DASH, UI_DEGREE, UI_BLOCK, UI_CASCADE = '\u00A0', '\u00A0', '\u2014', '\u00B0', '\u2588', '\u2514'
-# Not all character sets include these so best to use defaults above
-#    UI_BOX_TL, UI_BOX_BL, UI_BOX_TR, UI_BOX_BR = '\u250C', '\u2514', '\u2510', '\u2518'
-#    UI_BOX_L,  UI_BOX_R,  UI_BOX_T,  UI_BOX_B  = '\u251C', '\u2524', '\u252C', '\u2534'
-#    UI_BOX_M,  UI_BOX_H,  UI_BOX_V             = '\u253C', '\u2500', '\u2502'
+    # Not all character sets include these so best to use defaults above
+    # UI_BOX_TL, UI_BOX_BL, UI_BOX_TR, UI_BOX_BR = '\u250C', '\u2514', '\u2510', '\u2518'
+    # UI_BOX_L,  UI_BOX_R,  UI_BOX_T,  UI_BOX_B  = '\u251C', '\u2524', '\u252C', '\u2534'
+    # UI_BOX_M,  UI_BOX_H,  UI_BOX_V             = '\u253C', '\u2500', '\u2502'
     UI_EMOTICONS = [UI_DASH, '\U0001F60E', '\U0001F603', '\U0001F60A', '\U0001F610', '\U0001F61F', '\U0001F622', '\U0001F631']
 
 # Forward all messages through a queue (polled by background thread)
@@ -403,7 +403,8 @@ class Mmu:
         self.z_hop_speed = config.getfloat('z_hop_speed', 150., minval=1.)
         self.z_hop_accel = config.getint('z_hop_accel', self._toolhead_max_accel, minval=1)
         self.toolchange_retract = config.getfloat('toolchange_retract', 2., minval=0., maxval=5.)
-        self.toolchange_retract_speed = config.getfloat('toolchange_retract_speed', 20, minval=0.)
+        self.toolchange_retract_speed = config.getfloat('toolchange_retract_speed', 20, minval=1.)
+        self.toolchange_unretract_speed = config.getfloat('toolchange_unretract_speed', self.toolchange_retract_speed, minval=1.)
         self.restore_toolhead_xy_position = config.getint('restore_toolhead_xy_postion', 0) # Not currently exposed
 
         # Internal macro overrides
@@ -3338,7 +3339,7 @@ class Mmu:
         if self._is_in_print(force_in_print) and self.toolchange_retract > 0 and self.toolhead.get_extruder().get_heater().can_extrude:
             self._log_debug("Un-retracting %.1fmm" % self.toolchange_retract)
             self.gcode.run_script_from_command("M83")
-            self.gcode.run_script_from_command("G1 E%.2f F%d" % (self.toolchange_retract, self.toolchange_retract_speed * 60))
+            self.gcode.run_script_from_command("G1 E%.2f F%d" % (self.toolchange_retract, self.toolchange_unretract_speed * 60))
 
     def _clear_saved_toolhead_position(self):
         self.saved_toolhead_position = None
@@ -6285,6 +6286,7 @@ class Mmu:
         self.z_hop_ramp = gcmd.get_float('Z_HOP_RAMP', self.z_hop_ramp, minval=0.)
         self.toolchange_retract = gcmd.get_float('TOOLCHANGE_RETRACT', self.toolchange_retract, minval=0., maxval=5.)
         self.toolchange_retract_speed = gcmd.get_float('TOOLCHANGE_RETRACT_SPEED', self.toolchange_retract_speed, minval=0.)
+        self.toolchange_unretract_speed = gcmd.get_float('TOOLCHANGE_UNRETRACT_SPEED', self.toolchange_unretract_speed, minval=0.)
 
         # Software behavior options
         self.extruder_temp_variance = gcmd.get_float('EXTRUDER_TEMP_VARIANCE', self.extruder_temp_variance, minval=1.)
@@ -6397,12 +6399,13 @@ class Mmu:
         msg += "\nz_hop_accel = %d" % self.z_hop_accel
         msg += "\ntoolchange_retract = %.1f" % self.toolchange_retract
         msg += "\ntoolchange_retract_speed = %.1f" % self.toolchange_retract_speed
+        msg += "\ntoolchange_unretract_speed = %.1f" % self.toolchange_unretract_speed
 
         msg += "\n\nLOGGING:"
         msg += "\nlog_level = %d" % self.log_level
-        msg += "\nlog_file_level = %d" % self.log_file_level
+        msg += "\nlog_visual = %d" % self.log_visual
         if self.mmu_logger:
-            msg += "\nlog_visual = %d" % self.log_visual
+            msg += "\nlog_file_level = %d" % self.log_file_level
         msg += "\nlog_statistics = %d" % self.log_statistics
         msg += "\nconsole_gate_stat = %s" % self.console_gate_stat
 
