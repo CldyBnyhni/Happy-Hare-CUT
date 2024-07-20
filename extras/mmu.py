@@ -486,6 +486,19 @@ class Mmu:
         self.servo_dwell = config.getfloat('servo_dwell', 0.4, minval=0.1)
         self.servo_buzz_gear_on_down = config.getint('servo_buzz_gear_on_down', 3, minval=0, maxval=10)
 
+        # Servo CUT
+        self.servo_closed_angle = config.getint('servo_closed_angle', 180, minval=0, maxval=180)
+        self.servo_open_angle = config.getint('servo_open_angle', 0, minval=0, maxval=180)
+        self.servo_cut_angle = config.getint('servo_cut_angle', 0, minval=0, maxval=180)
+        self.servo_cut_duration = config.getfloat('servo_cut_duration', 0.5, minval=0.1)
+        self.servo_cut_dwell = config.getfloat('servo_cut_dwell', 0.5, minval=0.1) * 1000
+
+        # CUT motion
+        self.cut_feed_length = config.getfloat('cut_feed_length', 25)
+        self.cut_length = config.getfloat('cut_length', 5)
+        self.cut_attempts = config.getint('cut_attempts', 1)
+
+
         # TMC current control
         self.extruder_collision_homing_current = config.getint('extruder_collision_homing_current', 50, minval=10, maxval=100)
         self.extruder_form_tip_current = config.getint('extruder_form_tip_current', 100, minval=100, maxval=150)
@@ -708,6 +721,7 @@ class Mmu:
         self.gcode.register_command('__MMU_BOOTUP_TASKS', self.cmd_MMU_BOOTUP_TASKS, desc = self.cmd_MMU_BOOTUP_TASKS_help) # Bootup tasks
 
         # User defined
+
         self.gcode.register_command('MMU_CUT', self.cmd_MMU_CUT, desc=self.cmd_MMU_CUT_help)
         self.gcode.register_command('_MMU_STEP_UNLOAD_GATE_CUT', self.cmd_MMU_STEP_UNLOAD_GATE_CUT, desc = self.cmd_MMU_STEP_UNLOAD_GATE_CUT_help)
 
@@ -1389,7 +1403,19 @@ class Mmu:
                 'extruder_filament_remaining': self.filament_remaining,
                 'extruder_residual_filament': self.toolhead_ooze_reduction,
                 'toolchange_retract': self.toolchange_retract,
-                'gate_parking_distance': self.gate_parking_distance
+                'buzz_gear_motor': self._buzz_gear_motor,
+                'gate_parking_distance': self.gate_parking_distance,
+                'gate_endstop_to_encoder': self.gate_endstop_to_encoder,
+                'gate_homing_endstop': self.gate_homing_endstop,
+                'servo_closed_angle': self.servo_closed_angle,
+                'servo_open_angle': self.servo_open_angle,
+                'servo_cut_angle': self.servo_cut_angle,
+                'servo_cut_angle': self.servo_cut_angle,
+                'servo_cut_duration': self.servo_cut_duration,
+                'servo_cut_dwell': self.servo_cut_dwell,
+                'cut_feed_length': self.cut_feed_length,
+                'cut_length': self.cut_length,
+                'cut_attempts': self.cut_attempts,
         }
 
     def _reset_statistics(self):
@@ -3951,6 +3977,7 @@ class Mmu:
     cmd_MMU_CUT_help = "MMU cutter"
     def cmd_MMU_CUT(self, gcmd):
         self._servo_down()
+        parking = gcmd.get_int('PARKING', 1, minval=0, maxval=1)
         if self.gate_homing_endstop == self.ENDSTOP_ENCODER:
             self._trace_filament_move(None, -2, accel=self.gear_buzz_accel, encoder_dwell=None)
             found = self._buzz_gear_motor()
@@ -3958,13 +3985,14 @@ class Mmu:
                 self._servo_up()
                 raise gcmd.error("filament detected before it excision filament")
             else:
-                self.gcode.run_script_from_command("_MMU_CUT")
+                self.gcode.run_script_from_command("_MMU_CUT PARKING=%d" % parking)
         else:
+            sensor = self.sensors.get(self.ENDSTOP_GATE)
             if sensor.runout_helper.filament_present:
                 self._servo_up()
                 raise gcmd.error("filament detected before it excision filament")
             elif sensor.runout_helper.sensor_enabled:
-                self.gcode.run_script_from_command("_MMU_CUT")
+                self.gcode.run_script_from_command("_MMU_CUT PARKING=%d" % parking)
             else:
                 self._trace_filament_move(None, -2, accel=self.gear_buzz_accel, encoder_dwell=None)
                 found = self._buzz_gear_motor()
@@ -3972,7 +4000,7 @@ class Mmu:
                     self._servo_up()
                     raise gcmd.error("filament detected before it excision filament")
                 else:
-                    self.gcode.run_script_from_command("_MMU_CUT")
+                    self.gcode.run_script_from_command("_MMU_CUT PARKING=%d" % parking)
         self._servo_up()
 
     cmd_MMU_STEP_LOAD_BOWDEN_help = "User composable loading step: Smart loading of bowden"
@@ -4208,7 +4236,6 @@ class Mmu:
                 self._log_debug("Did not home to gate sensor")
 
         raise MmuError("Unloading gate failed")
-    
 
     # Shared gate functions to deduplicate logic
     def _validate_gate_config(self, direction):
