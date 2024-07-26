@@ -3978,8 +3978,8 @@ class Mmu:
     def cmd_MMU_CUT(self, gcmd):
         self._servo_down()
         parking = gcmd.get_int('PARKING', 1, minval=0, maxval=1)
+        self._trace_filament_move(None, -2, accel=self.gear_buzz_accel, encoder_dwell=None)
         if self.gate_homing_endstop == self.ENDSTOP_ENCODER:
-            self._trace_filament_move(None, -2, accel=self.gear_buzz_accel, encoder_dwell=None)
             found = self._buzz_gear_motor()
             if found:
                 self._servo_up()
@@ -3994,7 +3994,6 @@ class Mmu:
             elif sensor.runout_helper.sensor_enabled:
                 self.gcode.run_script_from_command("_MMU_CUT PARKING=%d" % parking)
             else:
-                self._trace_filament_move(None, -2, accel=self.gear_buzz_accel, encoder_dwell=None)
                 found = self._buzz_gear_motor()
                 if found:
                     self._servo_up()
